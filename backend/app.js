@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const Post = require('./models/post');
 
 const app = express();
-//mongo "mongodb+srv://cluster0-qs02p.mongodb.net/test" --username kenneth
+//mongo "mongodb+srv://cluster0-qs02p.mongodb.net/node-angular" --username kenneth
 //Yz9CupOcdi2NN0P3
 mongoose.connect('mongodb+srv://kenneth:Yz9CupOcdi2NN0P3@cluster0-qs02p.mongodb.net/node-angular?retryWrites=true&w=majority')
     .then(() => { //async db connection using mongoose app
@@ -32,7 +32,7 @@ app.post('/api/posts', (req, res, next) => {
         title: req.body.title,
         content: req.body.content
     });
-    console.log(post);
+    console.log(res);
     post.save(); //this will push data into mongodb atlas via mongoose 
                 //collection will be named after your pural form of your model name
     res.status(201).json({
@@ -41,20 +41,30 @@ app.post('/api/posts', (req, res, next) => {
 })
 
 app.get('/api/posts',(req, res, next) => {
-    const posts = [
-        {id: 'kenneth', 
-        title: 'First server-side post',
-        content: 'This is coming from the server'
-        },
-        {id: 'keen', 
-        title: 'Second server-side post',
-        content: 'This is also coming from the server!!!'
-        }
-    ];
-    res.status(200).json({
-        message: 'Post fetched successfully!',
-        posts: posts
-    });
+    // const posts = [
+    //     {id: 'kenneth', 
+    //     title: 'First server-side post',
+    //     content: 'This is coming from the server'
+    //     },
+    //     {id: 'keen', 
+    //     title: 'Second server-side post',
+    //     content: 'This is also coming from the server!!!'
+    //     }
+    // ];
+    Post.find().then(documents => {
+            console.log(documents);
+            const posts = documents
+
+            res.status(200).json({ // need to send response within async function
+                message: 'Post fetched successfully!',
+                posts: posts
+            });
+        });
 });
+
+app.delete("/api/posts/:id", (req, res, next) => {
+    console.log(req.params.id);
+    res.status(200).json({message: "Post deleted!"});
+})
 
 module.exports = app;
