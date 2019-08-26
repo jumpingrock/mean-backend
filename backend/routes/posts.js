@@ -11,25 +11,27 @@ const MIME_TYPE_MAP = {
 const storage = multer.diskStorage({
     destination: (req, file, callback) => {
         const isValid = MIME_TYPE_MAP[file.mimetype];
+        // console.log('lalalalalalalalalalalalala');
         let error = new Error('Invalid mime type');
         if (isValid) {
             error = null;
         }
-        callback(null, 'backend/image');
+        callback(error, 'backend/images');
     },
     filename: (req, file, callback) => {
+        // console.log('lalalalalalalalalalalalala!!!!!!!!!!!!!!!');
         const name = file.originalname.toLowerCase().split(' ').join('-');
         const ext = MIME_TYPE_MAP[file.mimetype];
         callback(null, name + '-' + Date.now() + '.' + ext);
     }
 });
 
-router.post('',multer(storage).single('image'), (req, res, next) => {
+router.post('',multer({storage: storage}).single("image"), (req, res, next) => {
     // const post = req.body;
-    
     const post = new Post({ // Post model is from router.js where it is hooked up to mongoose
         title: req.body.title,
         content: req.body.content
+        
     });
     // console.log(res);
     post.save().then(postCreated => {
