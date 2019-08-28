@@ -28,19 +28,26 @@ const storage = multer.diskStorage({
 
 router.post('',multer({storage: storage}).single("image"), (req, res, next) => {
     // const post = req.body;
+    const url = req.protocol + '://' + req.get('host');
     const post = new Post({ // Post model is from router.js where it is hooked up to mongoose
         title: req.body.title,
-        content: req.body.content
-        
+        content: req.body.content,
+        imagePath: url + "/images/" + req.file.filename
     });
     // console.log(res);
     post.save().then(postCreated => {
+        console.log('helloooooooooooooooooooooooooooooooooooo');
         console.log(postCreated);
         res.status(201).json({
             message: 'Post added Successfully!',
-            postId: postCreated._id
+            post: {
+                ...postCreated,
+                id: postCreated._id,
+                imagePath: postCreated.imagePath
+            }
+            
         }); //this will push data into mongodb atlas via mongoose 
-                //collection will be named after your pural form of your model name
+        // console.log(res);      //collection will be named after your pural form of your model name
     });
 })
 
