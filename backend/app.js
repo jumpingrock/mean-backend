@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const postsRoutes = require("./routes/posts");
@@ -17,6 +18,7 @@ mongoose.connect('mongodb+srv://kenneth:Yz9CupOcdi2NN0P3@cluster0-qs02p.mongodb.
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
+app.use("/images", express.static(path.join("backend/images")));
 
 app.use((req, res, next) => {// cors allow for sending of url msg using different localhost
     res.setHeader("Access-Control-Allow-Origin", "*"); 
