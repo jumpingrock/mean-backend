@@ -88,17 +88,24 @@ router.get('',(req, res, next) => {
     const currentPage = +req.query.currentpage;
     // console.log(pageSize, currentPage)
     const postQuery = Post.find(); //will only exercute when you call method with .then()
+    let fetchedPosts;
     if (pageSize && currentPage){
         postQuery
         .skip(pageSize * (currentPage - 1))
         .limit(pageSize);
     }
     // Post.find().then(documents => { // original query
-    postQuery.then(documents => { //new query with page property
-            const posts = documents
+    postQuery
+        .then(documents => {
+            fetchedPosts = documents;
+            return Post.count();
+        })
+        .then(count => { //new query with page property
+            
             res.status(200).json({ // need to send response within async function
                 message: 'Post fetched successfully!',
-                posts: posts
+                posts: fetchedPosts,
+                maxPosts: count
             });
         });
 });
