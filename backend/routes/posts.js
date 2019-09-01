@@ -52,9 +52,9 @@ router.post('',multer({storage: storage}).single("image"), (req, res, next) => {
 })
 
 router.put("/:id", multer({storage: storage}).single("image"), (req, res, next) => {
-    console.log("break");
-    console.log(req.file);
-    console.log("break");
+    // console.log("break");
+    // console.log(req.file);
+    // console.log("break");
     let imagePath = req.body.imagePath;
     if (req.file){
         const url = req.protocol + '://' + req.get('host');

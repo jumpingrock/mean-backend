@@ -3,6 +3,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const postsRoutes = require("./routes/posts");
+const userRoutes = require("./routes/user");
 
 const app = express();
 //mongo "mongodb+srv://cluster0-qs02p.mongodb.net/node-angular" --username kenneth
@@ -27,6 +28,7 @@ app.use((req, res, next) => {// cors allow for sending of url msg using differen
     next();
 })
 app.use('/api/posts', postsRoutes);
+app.use('/api/user', userRoutes);
 
 
 module.exports = app;
