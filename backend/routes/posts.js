@@ -1,6 +1,7 @@
 const express = require("express");
 const multer = require('multer');
 const Post = require('../models/post');
+const checkAuth = require("../middleware/check-auth");
 const router = express.Router();
 
 const MIME_TYPE_MAP = {
@@ -26,7 +27,7 @@ const storage = multer.diskStorage({
     }
 });
 
-router.post('',multer({storage: storage}).single("image"), (req, res, next) => {
+router.post('', checkAuth, multer({storage: storage}).single("image"), (req, res, next) => {
     // const post = req.body;
     const url = req.protocol + '://' + req.get('host');
     const post = new Post({ // Post model is from router.js where it is hooked up to mongoose
@@ -45,13 +46,12 @@ router.post('',multer({storage: storage}).single("image"), (req, res, next) => {
                 id: postCreated._id,
                 imagePath: postCreated.imagePath
             }
-            
         }); //this will push data into mongodb atlas via mongoose 
         // console.log(res);      //collection will be named after your pural form of your model name
     });
 })
 
-router.put("/:id", multer({storage: storage}).single("image"), (req, res, next) => {
+router.put("/:id", checkAuth, multer({storage: storage}).single("image"), (req, res, next) => {
     // console.log("break");
     // console.log(req.file);
     // console.log("break");
@@ -121,7 +121,7 @@ router.get('/:id',(req, res, next) => {
 });
 
 
-router.delete("/:id", (req, res, next) => { 
+router.delete("/:id", checkAuth, (req, res, next) => { 
     console.log(req.params.id + " Deleted");
     Post.deleteOne({_id: req.params.id}).then(result => {
         console.log(result);
