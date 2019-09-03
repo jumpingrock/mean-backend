@@ -54,7 +54,8 @@ router.post('/login', (req, res, next) => {
         );
         console.log(jwttoken)
         res.status(200).json({
-            token: jwttoken
+            token: jwttoken,
+            expiresIn: 3600 //expire duration in seconds
         });
     }).catch(err => {
         return res.status(401).json({
