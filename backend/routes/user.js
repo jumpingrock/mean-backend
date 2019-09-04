@@ -47,15 +47,18 @@ router.post('/login', (req, res, next) => {
                 message: "Auth Failed 2"
             })
         }
+        //console.log(fetchedUser);
         const jwttoken = jwt.sign(
-            {email: fetchedUser.email, userId: fetchedUser._Id}, 
+            {email: fetchedUser.email, userId: fetchedUser._id}, 
             "secret_this_should_be_longer", 
             { expiresIn: "1h" }
         );
+        console.log("JWT Token");
         console.log(jwttoken)
         res.status(200).json({
             token: jwttoken,
-            expiresIn: 3600 //expire duration in seconds
+            expiresIn: 3600, //expire duration in seconds
+            userId: fetchedUser._id
         });
     }).catch(err => {
         return res.status(401).json({

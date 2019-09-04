@@ -12,7 +12,6 @@ const MIME_TYPE_MAP = {
 const storage = multer.diskStorage({
     destination: (req, file, callback) => {
         const isValid = MIME_TYPE_MAP[file.mimetype];
-        // console.log('lalalalalalalalalalalalala');
         let error = new Error('Invalid mime type');
         if (isValid) {
             error = null;
@@ -20,7 +19,6 @@ const storage = multer.diskStorage({
         callback(error, 'backend/images');
     },
     filename: (req, file, callback) => {
-        // console.log('lalalalalalalalalalalalala!!!!!!!!!!!!!!!');
         const name = file.originalname.toLowerCase().split(' ').join('-');
         const ext = MIME_TYPE_MAP[file.mimetype];
         callback(null, name + '-' + Date.now() + '.' + ext);
@@ -33,12 +31,12 @@ router.post('', checkAuth, multer({storage: storage}).single("image"), (req, res
     const post = new Post({ // Post model is from router.js where it is hooked up to mongoose
         title: req.body.title,
         content: req.body.content,
-        imagePath: url + "/images/" + req.file.filename
+        imagePath: url + "/images/" + req.file.filename,
+        creator: req.userData.userId
     });
-    // console.log(res);
     post.save().then(postCreated => {
-        console.log('helloooooooooooooooooooooooooooooooooooo');
-        console.log(postCreated);
+        // console.log('helloooooooooooooooooooooooooooooooooooo');
+        // console.log(postCreated);
         res.status(201).json({
             message: 'Post added Successfully!',
             post: {
@@ -65,10 +63,15 @@ router.put("/:id", checkAuth, multer({storage: storage}).single("image"), (req, 
         title: req.body.title,
         content: req.body.content,
         imagePath: imagePath
+
     });
-    Post.updateOne({_id: req.params.id}, post).then( result => {
+    Post.updateOne({_id: req.params.id, creator: req.userData.userId}, post).then( result => {
         console.log(result);
-        res.status(200).json({message: 'Update successful!'});
+        if (result.nModified > 0) {
+            res.status(200).json({message: 'Update successful!'});
+        }else {
+            res.status(401).json({message: 'Not Authorized to update post!'});
+        }
     });
 });
 
@@ -123,9 +126,13 @@ router.get('/:id',(req, res, next) => {
 
 router.delete("/:id", checkAuth, (req, res, next) => { 
     console.log(req.params.id + " Deleted");
-    Post.deleteOne({_id: req.params.id}).then(result => {
+    Post.deleteOne({_id: req.params.id, creator: req.userData.userId}).then(result => {
         console.log(result);
-        res.status(200).json({message: "Post deleted!"});
+        if (result.n > 0) {
+            res.status(200).json({message: 'Delete successful!'});
+        }else {
+            res.status(401).json({message: 'Not authorized to delete post!'});
+        }
     })
 
     
