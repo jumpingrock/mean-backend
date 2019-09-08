@@ -20,20 +20,21 @@ router.post('/signup', (req, res, next) => {
                 result: result
             });
         }).catch(err => {
-            error: err
+            res.status(500).json({
+                message: "Invalid authentication credentials!"
+            });
         });
     });
 });
 
 router.post('/login', (req, res, next) => {
-
     let fetchedUser;
     User.findOne({email: req.body.email}) //keyword findOne().. different from find()
     .then(user => {
         // console.log(user[0].password);
-        if(!user){
+        if(!user){ //user not found
             return res.status(401).json({
-                message: "Auth Failed 1"
+                message: "Auth Failed Username or Password Incorrect!"
             })
         }
         fetchedUser = user;
@@ -42,9 +43,9 @@ router.post('/login', (req, res, next) => {
         return bcrypt.compare(req.body.password, user.password);
     }).then(result => {
         // console.log(result);
-        if(!result){
+        if(!result){ //password wrong
             return res.status(401).json({
-                message: "Auth Failed 2"
+                message: "Auth Failed Username or Password Incorrect!"
             })
         }
         //console.log(fetchedUser);
@@ -53,8 +54,8 @@ router.post('/login', (req, res, next) => {
             "secret_this_should_be_longer", 
             { expiresIn: "1h" }
         );
-        console.log("JWT Token");
-        console.log(jwttoken)
+        // console.log("JWT Token");
+        // console.log(jwttoken)
         res.status(200).json({
             token: jwttoken,
             expiresIn: 3600, //expire duration in seconds
@@ -62,7 +63,7 @@ router.post('/login', (req, res, next) => {
         });
     }).catch(err => {
         return res.status(401).json({
-                message: "Auth Failed 3"
+                message: "Invalid authentication credentials!"
         })
     });
 })

@@ -34,7 +34,8 @@ router.post('', checkAuth, multer({storage: storage}).single("image"), (req, res
         imagePath: url + "/images/" + req.file.filename,
         creator: req.userData.userId
     });
-    post.save().then(postCreated => {
+    post.save()
+    .then(postCreated => {
         // console.log('helloooooooooooooooooooooooooooooooooooo');
         // console.log(postCreated);
         res.status(201).json({
@@ -44,8 +45,12 @@ router.post('', checkAuth, multer({storage: storage}).single("image"), (req, res
                 id: postCreated._id,
                 imagePath: postCreated.imagePath
             }
-        }); //this will push data into mongodb atlas via mongoose 
-        // console.log(res);      //collection will be named after your pural form of your model name
+        })
+    })
+    .catch(error => {
+        res.status(500).json({
+            message: "Creating a post failed!"
+        })
     });
 })
 
@@ -62,31 +67,28 @@ router.put("/:id", checkAuth, multer({storage: storage}).single("image"), (req, 
         _id: req.body.id,
         title: req.body.title,
         content: req.body.content,
-        imagePath: imagePath
+        imagePath: imagePath,
+        creator: req.userData.userId
 
     });
-    Post.updateOne({_id: req.params.id, creator: req.userData.userId}, post).then( result => {
+    Post.updateOne({_id: req.params.id, creator: req.userData.userId}, post)
+    .then( result => {
         console.log(result);
         if (result.nModified > 0) {
             res.status(200).json({message: 'Update successful!'});
         }else {
             res.status(401).json({message: 'Not Authorized to update post!'});
         }
+    })
+    .catch(error => {//technical error like connection error
+        res.status(500).json({
+            message: "Coulden't update post!"
+        });
     });
 });
 
 router.get('',(req, res, next) => {
-    // const posts = [
-    //     {id: 'kenneth', 
-    //     title: 'First server-side post',
-    //     content: 'This is coming from the server'
-    //     },
-    //     {id: 'keen', 
-    //     title: 'Second server-side post',
-    //     content: 'This is also coming from the server!!!'
-    //     }
-    // ];
-    // console.log(req);
+    
     const pageSize = +req.query.pagesize;
     const currentPage = +req.query.currentpage;
     // console.log(pageSize, currentPage)
@@ -110,30 +112,43 @@ router.get('',(req, res, next) => {
                 posts: fetchedPosts,
                 maxPosts: count
             });
+        })
+        .catch(error => {
+            res.status(500).json({message: "Fetching post failed!"})
         });
 });
 
 router.get('/:id',(req, res, next) => {
-    Post.findById(req.params.id).then(post => {
+    Post.findById(req.params.id)
+    .then(post => {
         if (post) {
             res.status(200).json(post);
         }else {
             res.status(404).json({message: 'Post not found!'});
         }
+    }).catch(error => {
+        res.status(500).json({
+            message: "Fetching post failed"
+        })
     });
 });
 
 
 router.delete("/:id", checkAuth, (req, res, next) => { 
     console.log(req.params.id + " Deleted");
-    Post.deleteOne({_id: req.params.id, creator: req.userData.userId}).then(result => {
+    Post.deleteOne({_id: req.params.id, creator: req.userData.userId})
+    .then(result => {
         console.log(result);
         if (result.n > 0) {
             res.status(200).json({message: 'Delete successful!'});
         }else {
             res.status(401).json({message: 'Not authorized to delete post!'});
         }
-    })
+    }).catch(error => {
+        res.status(500).json({
+            message: "Fetching post failed"
+        })
+    });
 
     
 })
