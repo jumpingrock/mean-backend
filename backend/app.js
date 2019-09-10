@@ -9,7 +9,8 @@ const app = express();
 //mongo "mongodb+srv://cluster0-qs02p.mongodb.net/node-angular" --username kenneth
 //Yz9CupOcdi2NN0P3
 // mongoose.connect('mongodb+srv://kenneth:Yz9CupOcdi2NN0P3@cluster0-qs02p.mongodb.net/node-angular') // remove retrywrite known bug with mongoose (cyclic dependency detected)
-mongoose.connect('mongodb+srv://kenneth:Yz9CupOcdi2NN0P3@cluster0-qs02p.mongodb.net/node-angular?retryWrites=true&w=majority')
+// mongoose.connect('mongodb+srv://kenneth:Yz9CupOcdi2NN0P3@cluster0-qs02p.mongodb.net/node-angular?retryWrites=true&w=majority')
+mongoose.connect('mongodb+srv://kenneth:'+process.env.MONGO_ATLAS_PWD+'@cluster0-qs02p.mongodb.net/node-angular?retryWrites=true&w=majority')
 
     .then(() => { //async db connection using mongoose app
         console.log('Connected to mongoDB!');
